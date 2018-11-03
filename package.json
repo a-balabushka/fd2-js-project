@@ -1,0 +1,29 @@
+{
+  "name": "fd2-js-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "jest": "^23.6.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.8.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  },
+  "scripts": {
+    "lint": "eslint",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-balabushka/fd2-js-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a-balabushka/fd2-js-project/issues"
+  },
+  "homepage": "https://github.com/a-balabushka/fd2-js-project#readme",
+  "description": ""
+}
