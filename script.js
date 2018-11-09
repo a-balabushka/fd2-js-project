@@ -33,49 +33,48 @@ var map = [
   [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
   [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 ];
-var shells = [];
 
 var sprite = new Image();
 sprite.onload = drawGame;
 sprite.src = 'img/sprites.png';
 
-var userTank = {
-  posX: 144,
-  posY: 384,
-  speedX: 0,
-  speedY: 0,
-  width: tileSize * 2,
-  height: tileSize * 2,
+function TTank(x, y, speed, spriteY, bot) {
+  this.posX = x;
+  this.posY = y;
+  this.speedX = 0;
+  this.speedY = 0;
+  this.width = tileSize * 2;
+  this.height = tileSize * 2;
   // снаряд
-  posShellX: this.posX + 12,
-  posShellY: this.posY + 12,
-  speedShellX: 0,
-  speedShellY: 0,
-  widthShell: tileSize / 2,
-  heightShell: tileSize / 2,
-  up: function () {
-    this.speedY = -1;
+  this.posShellX = this.posX + 12;
+  this.posShellY = this.posY + 12;
+  this.speedShellX = 0;
+  this.speedShellY = 0;
+  this.widthShell = tileSize / 2;
+  this.heightShell = tileSize / 2;
+  this.up = function () {
+    this.speedY = -speed;
     this.speedShellY = -4;
-  },
-  right: function () {
-    this.speedX = 1;
+  };
+  this.right = function () {
+    this.speedX = speed;
     this.speedShellX = 4;
-  },
-  down: function () {
-    this.speedY = 1;
+  };
+  this.down = function () {
+    this.speedY = speed;
     this.speedShellY = 4;
-  },
-  left: function () {
-    this.speedX = -1;
+  };
+  this.left = function () {
+    this.speedX = -speed;
     this.speedShellX = -4;
-  },
-  shift: function () {
+  };
+  this.shift = function () {
     this.posX += this.speedX;
     this.posY += this.speedY;
-  },
-  directionUp: function () {
-    context.drawImage(sprite, 210, 0, 32, 32, this.posX, this.posY, 32, 32);
-  },
+  };
+  this.directionUp = function () {
+    context.drawImage(sprite, 210, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+  };
   /*  directionRight: function () {
     context.drawImage(sprite, 140, 0, 32, 32, this.posX, this.posY, 32, 32);
   },
@@ -85,7 +84,7 @@ var userTank = {
   directionLeft: function () {
     context.drawImage(sprite, 70, 0, 32, 32, this.posX, this.posY, 32, 32);
   }, */
-  outTank: function () { // выход за границу
+  this.outTank = function () { // выход за границу
     if (this.posY + this.height > canvas.height) {
       this.posY = canvas.height - this.height;
     }
@@ -98,8 +97,8 @@ var userTank = {
     if (this.posX < 0) {
       this.posX = 0;
     }
-  },
-  checkObstacles: function () {
+  };
+  this.checkObstacles = function () {
     var curPosY = Math.round(this.posY / tileSize);
     var curPosX = Math.round(this.posX / tileSize);
 
@@ -147,21 +146,66 @@ var userTank = {
         }
       }
     }
-  },
-  shot: function () {
+  };
+  this.shot = function () {
     context.drawImage(sprite, 45, 80, 8, 8, this.posShellX, this.posShellY, 8, 8);
     this.posShellX +=  this.speedShellX;
     this.posShellY +=  this.speedShellY;
     console.log('Fire!');
-  },
-
-  createTank: function () {
-    userTank.shift();
-    userTank.directionUp();
-    userTank.checkObstacles();
-    userTank.outTank();
+  };
+  this.createTank = function () {
+    this.shift();
+    this.directionUp();
+    this.checkObstacles();
+    this.outTank();
+  };
+  if (bot) {
+    function botMotion(entity) {
+      function randomDiap(N, M) {
+        return Math.floor(Math.random() * (M - N + 1) + N);
+      }
+      var direction = randomDiap(1, 4);
+      var timeDirection = randomDiap(1000, 3000);
+      switch (direction) {
+      case 1:
+        entity.up();
+        break;
+      case 2:
+        entity.right();
+        break;
+      case 3:
+        entity.down();
+        break;
+      case 4:
+        entity.left();
+        break;
+      }
+      setTimeout(botMotion, timeDirection, entity);
+    }
+    botMotion(this);
   }
-};
+}
+
+/* --------------------------------------------------------------- */
+
+var botTanksArr = [new TTank(0, 0, 0.5, 40, 1)];
+var userTank = new TTank(144, 384, 1, 0, 0);
+
+setInterval(generateBotTank, 5000);
+
+function generateBotTank() {
+  if (botTanksArr.length < 5) {
+    if (botTanksArr.length % 2 === 0) {
+      botTanksArr.push(new TTank(0, 0, 0.5, 40, 1));
+    } else {
+      botTanksArr.push(new TTank(384, 0, 0.5, 40, 1));
+    }
+  }
+}
+
+function createBotTank(bot) {
+  bot.createTank();
+}
 
 /* --------------------------------------------------------------- */
 
@@ -170,6 +214,7 @@ requestAnimationFrame(tick);
 function tick() {
   drawGame();
   userTank.createTank();
+  botTanksArr.forEach(createBotTank);
   requestAnimationFrame(tick);
 }
 
@@ -191,7 +236,7 @@ function drawGame() {
   }
 }
 
-window.addEventListener('keydown', function (EO) {
+document.addEventListener('keydown', function (EO) {
   switch (EO.keyCode) {
   case 38:
     userTank.up();
@@ -207,12 +252,11 @@ window.addEventListener('keydown', function (EO) {
     break;
   case 32:
     userTank.shot();
-
     break;
   }
 });
 
-window.addEventListener('keyup', function (EO) {
+document.addEventListener('keyup', function (EO) {
   if (EO.keyCode === 38 || EO.keyCode === 40) {
     userTank.speedY = 0;
   }
