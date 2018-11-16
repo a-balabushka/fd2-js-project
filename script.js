@@ -1,5 +1,5 @@
 'use strict';
-
+// canvas colliding matrix
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 var tileSize = 16; // tile size
@@ -34,65 +34,113 @@ var map = [
   [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 ];
 
+var currentSecond = 0;
+var frameCount = 0;
+var framesLastSecond = 0;
+
+var botTanksArr = [];
+
+/* --------------------------------------------------------------- */
+
 var sprite = new Image();
 sprite.onload = drawGame;
 sprite.src = 'img/sprites.png';
+
+/* --------------------------------------------------------------- */
+var shooting = false;
+
+var bullet = {
+  posX: 0,
+  posY: 0,
+  size: 8,
+  speed: 1.75,
+  out: function () {
+    if (bullet.posY < 0 || bullet.posY - bullet.size > canvas.height) {
+      shooting = false;
+    }
+
+    if (bullet.posX < 0 || bullet.posX - bullet.size > canvas.width) {
+      shooting = false;
+    }
+  },
+  collision: function () {
+    var bposX = Math.round(bullet.posX / 16);
+    var bposY = Math.round(bullet.posY / 16);
+
+    for (var i = 0; i <= bposY; i++) {
+      var blockY = map[i][bposX];
+      if (blockY === 0) {
+        if (bposY < (i + 1)) {
+          map[i][bposX] = 5;
+          shooting = false;
+        }
+      }
+    }
+  },
+  drawBullet: function () {
+    context.drawImage(sprite, 45, 80, 8, 8, this.posX, this.posY, 8, 8);
+    this.out();
+    this.collision();
+  }
+};
+
 
 function TTank(x, y, speed, spriteY, bot) {
   this.posX = x;
   this.posY = y;
   this.speedX = 0;
   this.speedY = 0;
-  this.width = tileSize * 2;
-  this.height = tileSize * 2;
-  // снаряд
-  this.posShellX = this.posX + 12;
-  this.posShellY = this.posY + 12;
-  this.speedShellX = 0;
-  this.speedShellY = 0;
-  this.widthShell = tileSize / 2;
-  this.heightShell = tileSize / 2;
+  this.size = tileSize * 2;
+  this.positionView = 1;
   this.up = function () {
     this.speedY = -speed;
-    this.speedShellY = -4;
+    this.speedX = 0;
+    this.positionView = 1;
   };
   this.right = function () {
     this.speedX = speed;
-    this.speedShellX = 4;
+    this.speedY = 0;
+    this.positionView = 2;
   };
   this.down = function () {
     this.speedY = speed;
-    this.speedShellY = 4;
+    this.speedX = 0;
+    this.positionView = 3;
   };
   this.left = function () {
     this.speedX = -speed;
-    this.speedShellX = -4;
+    this.speedY = 0;
+    this.positionView = 4;
   };
   this.shift = function () {
     this.posX += this.speedX;
     this.posY += this.speedY;
   };
-  this.directionUp = function () {
-    context.drawImage(sprite, 210, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+  this.imageView = function () {
+    switch (this.positionView) {
+    case 1:
+      context.drawImage(sprite, 210, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+      break;
+    case 2:
+      context.drawImage(sprite, 140, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+      break;
+    case 3:
+      context.drawImage(sprite, 0, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+      break;
+    case 4:
+      context.drawImage(sprite, 70, spriteY, 32, 32, this.posX, this.posY, 32, 32);
+      break;
+    }
   };
-  /*  directionRight: function () {
-    context.drawImage(sprite, 140, 0, 32, 32, this.posX, this.posY, 32, 32);
-  },
-  directionDown: function () {
-    context.drawImage(sprite, 0, 0, 32, 32, this.posX, this.posY, 32, 32);
-  },
-  directionLeft: function () {
-    context.drawImage(sprite, 70, 0, 32, 32, this.posX, this.posY, 32, 32);
-  }, */
   this.outTank = function () { // выход за границу
-    if (this.posY + this.height > canvas.height) {
-      this.posY = canvas.height - this.height;
+    if (this.posY + this.size > canvas.height) {
+      this.posY = canvas.height - this.size;
     }
     if (this.posY < 0) {
       this.posY = 0;
     }
-    if (this.posX + this.width > canvas.width) {
-      this.posX = canvas.width - this.width;
+    if (this.posX + this.size > canvas.width) {
+      this.posX = canvas.width - this.size;
     }
     if (this.posX < 0) {
       this.posX = 0;
@@ -132,6 +180,7 @@ function TTank(x, y, speed, spriteY, bot) {
       if ((part1 === 0 || part1 === 1) || (part2 === 0 || part2 === 1)) {
         if (this.posY < (i + 1) * tileSize) {
           this.posY = (i + 1) * tileSize;
+          this.positionView = 1;
         }
       }
     }
@@ -147,17 +196,22 @@ function TTank(x, y, speed, spriteY, bot) {
       }
     }
   };
-  this.shot = function () {
-    context.drawImage(sprite, 45, 80, 8, 8, this.posShellX, this.posShellY, 8, 8);
-    this.posShellX +=  this.speedShellX;
-    this.posShellY +=  this.speedShellY;
-    console.log('Fire!');
+  this.shoot = function () {
+    if (!shooting) {
+      shooting = true;
+      bullet.posX = this.posX + 12;
+      bullet.posY = this.posY + 12;
+    }
   };
   this.createTank = function () {
     this.shift();
-    this.directionUp();
+    this.imageView();
     this.checkObstacles();
     this.outTank();
+    if (shooting) {
+      bullet.posY -= bullet.speed;
+      bullet.drawBullet();
+    }
   };
   if (bot) {
     function botMotion(entity) {
@@ -188,8 +242,8 @@ function TTank(x, y, speed, spriteY, bot) {
 
 /* --------------------------------------------------------------- */
 
-var botTanksArr = [new TTank(0, 0, 0.5, 40, 1)];
-var userTank = new TTank(144, 384, 1, 0, 0);
+botTanksArr = [new TTank(0, 0, 0.75, 40, 1)];
+var userTank = new TTank(144, 384, 1.25, 0, 0);
 
 setInterval(generateBotTank, 5000);
 
@@ -209,16 +263,40 @@ function createBotTank(bot) {
 
 /* --------------------------------------------------------------- */
 
+function isWithin(a, b, c) {
+  return (a > b && a < c);
+}
+
+function isColliding(a, b) {
+  var result = false;
+  if (isWithin(a.posX + a.size, b.posX, b.posX + b.size) || isWithin(a.posX + a.size, b.posX, b.posX + b.size)) {
+    if (isWithin(a.posY + a.size, b.posY, b.posY + b.size) || isWithin(a.posY + a.size, b.posY, b.posY + b.size)) {
+      result = true;
+    }
+  }
+  return result;
+}
+
+/* --------------------------------------------------------------- */
+
 requestAnimationFrame(tick);
 
 function tick() {
   drawGame();
-  userTank.createTank();
-  botTanksArr.forEach(createBotTank);
+
   requestAnimationFrame(tick);
 }
 
 function drawGame() {
+  var sec = Math.floor(Date.now() / 1000);
+  if (sec !== currentSecond) {
+    currentSecond = sec;
+    framesLastSecond = frameCount;
+    frameCount = 1;
+  } else {
+    frameCount++;
+  }
+
   for (var y = 0; y < mapSize; y++) {
     for (var x = 0; x < mapSize; x++) {
       switch (map[y][x]) {
@@ -234,7 +312,27 @@ function drawGame() {
       }
     }
   }
+
+  userTank.createTank();
+  botTanksArr.forEach(createBotTank);
+  context.fillStyle = '#ff0000';
+  context.font = 'italic bold 20px Arial';
+  context.fillText('FPS: ' + framesLastSecond, 10, 20);
+
+  /* ---------------------------------------- */
+
+  if (shooting) {
+    botTanksArr.forEach(function (bot, i) {
+      if (isColliding(bullet, bot)) {
+        botTanksArr.splice(i, 1);
+        shooting = false;
+      }
+    });
+  }
+  /* ---------------------------------------- */
 }
+
+/* --------------------------------------------------------------- */
 
 document.addEventListener('keydown', function (EO) {
   switch (EO.keyCode) {
@@ -251,7 +349,7 @@ document.addEventListener('keydown', function (EO) {
     userTank.left();
     break;
   case 32:
-    userTank.shot();
+    userTank.shoot();
     break;
   }
 });
