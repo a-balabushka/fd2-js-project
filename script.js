@@ -31,11 +31,13 @@ const map = [
   [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
   [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 0, 0, 0, 0, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
   [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 ];
 
 const bulletsArr = [];
 let botTanksArr = [];
+
+let score = 0;
 
 /* --------------------------------------------------------------- */
 
@@ -46,44 +48,53 @@ sprite.src = 'img/sprites.png';
 /* --------------------------------------------------------------- */
 
 class Tank {
-  constructor(x, y, speed, spriteY, bot) {
+  constructor(x, y, speed, spriteY, bot, id) {
+    this.id = id;
     this.bot = bot;
     this.posX = x;
     this.posY = y;
     this.speed = speed;
     this.speedX = 0;
     this.speedY = 0;
+    this.spriteX = 0;
     this.spriteY = spriteY;
+    this.counter = 0;
     this.size = tileSize * 2;
     this.positionView = 1;
     this.shooting = false;
-    // мне не нравится где расположен if, но я не придумал пока более гуманный рабочий способ
-    if (this.bot) {
-      function botMotion(entity) {
-        function randomDiap(N, M) {
-          return Math.floor(Math.random() * (M - N + 1) + N);
-        }
-        const direction = randomDiap(1, 4);
-        const timeDirection = randomDiap(1000, 3000);
-        switch (direction) {
-          case 1:
-            entity.up();
-            break;
-          case 2:
-            entity.right();
-            break;
-          case 3:
-            entity.down();
-            break;
-          case 4:
-            entity.left();
-            break;
-        }
-        setTimeout(botMotion, timeDirection, entity);
-      }
 
-      botMotion(this);
+    if (this.bot) {
+      this.randomBotMotion();
     }
+  }
+
+  randomBotMotion() {
+    function botMotion(entity) {
+      function randomDiap(N, M) {
+        return Math.floor(Math.random() * (M - N + 1) + N);
+      }
+      const direction = randomDiap(1, 6);
+      const timeDirection = randomDiap(1000, 3000);
+      switch (direction) {
+        case 1:
+          entity.up();
+          break;
+        case 2:
+          entity.right();
+          break;
+        case 3:
+          entity.down();
+          break;
+        case 4:
+          entity.left();
+          break;
+        default:
+          entity.shoot();
+      }
+      setTimeout(botMotion, timeDirection, entity);
+    }
+
+    botMotion(this);
   }
 
   up() {
@@ -176,51 +187,85 @@ class Tank {
     }
   }
 
+  deathUser() {
+    botTanksArr.forEach((bot) => {
+      if (isColliding(bot, userTank)) {
+        console.log('Раздавлен');
+      }
+    });
+  }
+
   shoot() {
     if (!this.shooting) {
       this.shooting = true;
-      const bullet = new Bullet(this.posX, this.posY, this.positionView, this.bot);
+      const bullet = new Bullet(this.posX, this.posY, this.positionView, this.bot, this.id);
       bulletsArr.push(bullet);
       setTimeout(() => {
         this.shooting = false;
-      }, 2000);
+      }, 1500);
     }
   }
 
   update() {
+    this.counter++;
     this.posX += this.speedX;
     this.posY += this.speedY;
     this.checkGoingBeyond();
     this.obstaclesCheck();
+    this.deathUser();
+  }
+
+  animation() {
+    if (this.speedX !== 0 || this.speedY !== 0) {
+      switch (this.positionView) {
+        case 1:
+          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 210;
+          break;
+        case 2:
+          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 140;
+          break;
+        case 3:
+          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3);
+          break;
+        case 4:
+          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 70;
+          break;
+      }
+    } else {
+      switch (this.positionView) {
+        case 1:
+          this.spriteX = 210;
+          break;
+        case 2:
+          this.spriteX = 140;
+          break;
+        case 3:
+          this.spriteX = 0;
+          break;
+        case 4:
+          this.spriteX = 70;
+          break;
+      }
+    }
   }
 
   draw() {
-    switch (this.positionView) {
-      case 1:
-        context.drawImage(sprite, 210, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
-        break;
-      case 2:
-        context.drawImage(sprite, 140, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
-        break;
-      case 3:
-        context.drawImage(sprite, 0, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
-        break;
-      case 4:
-        context.drawImage(sprite, 70, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
-        break;
-    }
+    this.animation();
+    context.drawImage(sprite, this.spriteX, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
     this.update();
   }
 }
 
 class Bullet {
-  constructor(x, y, positionView, bot) {
+  constructor(x, y, positionView, bot, id) {
+    this.id = id;
     this.bot = bot;
     this.posX = x + 12;
     this.posY = y + 12;
     this.size = 8;
     this.speed = 3;
     this.positionView = positionView;
+    this.counter = 0;
   }
 
   checkGoingBeyond() {
@@ -231,17 +276,25 @@ class Bullet {
   }
 
   collisionDetection() {
-/*    const bposX = Math.round(this.posX / tileSize);
+    const bposX = Math.round(this.posX / tileSize);
     const bposY = Math.round(this.posY / tileSize);
+
     for (let i = 0; i <= bposY; i++) {
       const blockY = map[i][bposX];
       if (blockY === 0) {
         if (bposY < (i + 1)) {
           map[i][bposX] = 5;
           bulletsArr.splice(bulletsArr.indexOf(this), 1);
+          this.animationHit();
         }
       }
-    }*/
+      if (blockY === 1) {
+        if (bposY < (i + 1)) {
+          bulletsArr.splice(bulletsArr.indexOf(this), 1);
+          this.animationHit();
+        }
+      }
+    }
   }
 
   killBot() {
@@ -249,11 +302,32 @@ class Bullet {
       botTanksArr.forEach((bot, i) => {
         for (let j = 0; j < bulletsArr.length; j++) {
           if (isColliding(bulletsArr[j], bot)) {
-            botTanksArr.splice(i, 1);
+            botTanksArr[i].bot = false;
+            // bot.bot = false;
+            // botTanksArr.splice(i, 1);
             bulletsArr.splice(j, 1);
+            score += 100;
+            console.log(score);
           }
         }
       });
+    }
+  }
+
+  deathUser() {
+    if (this.bot) {
+      for (let j = 0; j < bulletsArr.length; j++) {
+        if (isColliding(bulletsArr[j], userTank)) {
+          bulletsArr.splice(j, 1);
+          console.log('Прямое попадание');
+        }
+      }
+    }
+  }
+
+  animationHit() {
+    for (let i = 0; i < 3; i++) {
+      context.drawImage(sprite, (Math.floor(this.counter / 60 % 3)) * i * 35, 100, 32, 32, this.posX - 12, this.posY - 12, 32, 32);
     }
   }
 
@@ -275,6 +349,7 @@ class Bullet {
     this.checkGoingBeyond();
     this.collisionDetection();
     this.killBot();
+    this.deathUser();
   }
 
   draw() {
@@ -285,33 +360,35 @@ class Bullet {
 
 /* --------------------------------------------------------------- */
 
-function isWithin(a, b, c) {
-  return (a > b && a < c);
-}
-
 function isColliding(a, b) {
   let result = false;
-  if (isWithin(a.posX + a.size, b.posX, b.posX + b.size) || isWithin(a.posX + a.size, b.posX, b.posX + b.size)) {
-    if (isWithin(a.posY + a.size, b.posY, b.posY + b.size) || isWithin(a.posY + a.size, b.posY, b.posY + b.size)) {
-      result = true;
-    }
+
+  const aRight = a.posX + a.size;
+  const aBottom = a.posY + a.size;
+  const bRight = b.posX + b.size;
+  const bBottom = b.posY + b.size;
+
+  if (a.posX <= bRight && aRight >= b.posX && a.posY <= bBottom && aBottom >= b.posY) {
+    result = true;
   }
   return result;
 }
 
 /* --------------------------------------------------------------- */
 
-const userTank = new Tank(144, 384, 1.25, 0, false);
-botTanksArr = [new Tank(0, 0, 0.75, 40, true)];
+const userTank = new Tank(144, 384, 1.25, 0, false, 100);
+botTanksArr = [new Tank(0, 0, 0.75, 40, true, 0)];
 
 /* --------------------------------------------------------------- */
 
+let idCount = 0;
 function generateBotTank() {
   if (botTanksArr.length < 5) {
+    idCount += 1;
     if (botTanksArr.length % 2 === 0) {
-      botTanksArr.push(new Tank(0, 0, 0.5, 40, 1));
+      botTanksArr.push(new Tank(0, 0, 0.5, 40, true, idCount));
     } else {
-      botTanksArr.push(new Tank(384, 0, 0.5, 40, 1));
+      botTanksArr.push(new Tank(384, 0, 0.5, 40, true, idCount));
     }
   }
 }
@@ -320,11 +397,11 @@ setInterval(generateBotTank, 5000);
 
 /* --------------------------------------------------------------- */
 
-requestAnimationFrame(tick);
+window.requestAnimationFrame(tick);
 
 function tick() {
   drawGame();
-  requestAnimationFrame(tick);
+  window.requestAnimationFrame(tick);
 }
 
 /* --------------------------------------------------------------- */
