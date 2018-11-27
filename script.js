@@ -1,49 +1,29 @@
-'use strict';
-
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const tileSize = 16; // tile size
 const mapSize = 26; // number of tiles
 // 0: brick, 1: steel, 2: water, 3: tree, 5: blank
-const map = [
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 1, 1, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 1, 1, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [0, 0, 5, 5, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 5, 5, 0, 0],
-  [1, 1, 5, 5, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 5, 5, 1, 1],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 0, 0, 5, 5, 0, 0, 5, 5, 5, 0, 0, 0, 0, 5, 5, 5, 0, 0, 5, 5, 0, 0, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 5, 5, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
-];
 
-const bulletsArr = [];
+let map;
+let tankAmount;
+
+let userTank;
 let botTanksArr = [];
+const bulletsArr = [];
 
 let score = 0;
+let level = 1;
 
 /* --------------------------------------------------------------- */
 
 const sprite = new Image();
 sprite.onload = drawGame;
 sprite.src = 'img/sprites.png';
+
+const trees = new Image();
+trees.onload = drawGame;
+trees.src = 'img/trees.png';
+
 
 /* --------------------------------------------------------------- */
 
@@ -73,7 +53,7 @@ class Tank {
       function randomDiap(N, M) {
         return Math.floor(Math.random() * (M - N + 1) + N);
       }
-      const direction = randomDiap(1, 6);
+      const direction = randomDiap(1, 4);
       const timeDirection = randomDiap(1000, 3000);
       switch (direction) {
         case 1:
@@ -303,8 +283,7 @@ class Bullet {
         for (let j = 0; j < bulletsArr.length; j++) {
           if (isColliding(bulletsArr[j], bot)) {
             botTanksArr[i].bot = false;
-            // bot.bot = false;
-            // botTanksArr.splice(i, 1);
+            botTanksArr.splice(i, 1);
             bulletsArr.splice(j, 1);
             score += 100;
             console.log(score);
@@ -321,6 +300,15 @@ class Bullet {
           bulletsArr.splice(j, 1);
           console.log('Прямое попадание');
         }
+      }
+    }
+  }
+
+  destroyEagle() {
+    for (let j = 0; j < bulletsArr.length; j++) {
+      if (isColliding(bulletsArr[j], eagle)) {
+        bulletsArr.splice(j, 1);
+        console.log('База разрушена');
       }
     }
   }
@@ -350,6 +338,7 @@ class Bullet {
     this.collisionDetection();
     this.killBot();
     this.deathUser();
+    this.destroyEagle();
   }
 
   draw() {
@@ -357,6 +346,19 @@ class Bullet {
     this.update();
   }
 }
+
+const eagle = {
+  posX: 192,
+  posY: 384,
+  size: tileSize * 2,
+  draw() {
+    context.drawImage(sprite, 105, 100, 32, 32, this.posX, this.posY, 32, 32);
+  },
+};
+
+/* --------------------------------------------------------------- */
+
+init();
 
 /* --------------------------------------------------------------- */
 
@@ -376,50 +378,39 @@ function isColliding(a, b) {
 
 /* --------------------------------------------------------------- */
 
-const userTank = new Tank(144, 384, 1.25, 0, false, 100);
-botTanksArr = [new Tank(0, 0, 0.75, 40, true, 0)];
-
-/* --------------------------------------------------------------- */
-
-let idCount = 0;
-function generateBotTank() {
-  if (botTanksArr.length < 5) {
-    idCount += 1;
-    if (botTanksArr.length % 2 === 0) {
-      botTanksArr.push(new Tank(0, 0, 0.5, 40, true, idCount));
-    } else {
-      botTanksArr.push(new Tank(384, 0, 0.5, 40, true, idCount));
-    }
-  }
+function init() {
+  map = Array.from(levels.level1);
+  userTank = new Tank(144, 384, 1.25, 0, false, 100);
+  botTanksArr = [new Tank(0, 0, 0.75, 40, true, 0)];
+  tankAmount = 4;
 }
 
-setInterval(generateBotTank, 5000);
-
 /* --------------------------------------------------------------- */
 
-window.requestAnimationFrame(tick);
+(function startGame() {
+  window.requestAnimationFrame(tick);
+  setInterval(generateBotTank, 5000);
+})();
 
 function tick() {
   drawGame();
   window.requestAnimationFrame(tick);
 }
 
+let idCount = 0;
+function generateBotTank() {
+  if ((tankAmount !== 0) && (botTanksArr.length < 5)) {
+    const x = Math.floor(Math.random() * (2 + 1));
+    idCount += 1;
+    botTanksArr.push(new Tank(x * 200, 0, 0.5, 40, true, idCount));
+    tankAmount--;
+  }
+}
+
 /* --------------------------------------------------------------- */
 
 function drawGame() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  for (let y = 0; y < mapSize; y++) {
-    for (let x = 0; x < mapSize; x++) {
-      switch (map[y][x]) {
-        case 0:
-          context.drawImage(sprite, 60, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
-          break;
-        case 1:
-          context.drawImage(sprite, 85, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
-          break;
-      }
-    }
-  }
 
   userTank.draw();
 
@@ -430,6 +421,68 @@ function drawGame() {
   for (let i = 0; i < botTanksArr.length; i++) {
     botTanksArr[i].draw();
   }
+
+  eagle.draw();
+
+  drawMap();
+}
+
+function drawMap() {
+  if (tankAmount === 0 && botTanksArr.length === 0) {
+    if (level < 4) {
+      level++;
+    }
+
+    userTank.posX = 144;
+    userTank.posY = 384;
+    userTank.positionView = 1;
+    nextLevel(level);
+  }
+
+  for (let y = 0; y < mapSize; y++) {
+    for (let x = 0; x < mapSize; x++) {
+      switch (map[y][x]) {
+        case 0:
+          context.drawImage(sprite, 60, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          break;
+        case 1:
+          context.drawImage(sprite, 85, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          break;
+        case 3:
+          context.drawImage(trees, 0, 0, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          break;
+      }
+    }
+  }
+}
+
+function nextLevel(num) {
+  const levelKey = `level${num}`;
+  for (let key in levels) {
+    if (levelKey == key) {
+      map = Array.from(levels[key]);
+      tankAmount = 5;
+    }
+
+    if (num === 4) {
+      tankAmount = Infinity;
+    }
+  }
+
+  /*  switch (level) {
+    case 2:
+      map = Array.from(level2);
+      tankAmount = 5;
+      break;
+    case 3:
+      map = Array.from(level3);
+      tankAmount = 5;
+      break;
+    case 4:
+      map = Array.from(level4);
+      tankAmount = Infinity;
+      break;
+  } */
 }
 
 /* --------------------------------------------------------------- */
