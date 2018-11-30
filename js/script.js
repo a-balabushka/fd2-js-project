@@ -159,6 +159,11 @@ class Tank {
       this.shooting = true;
       const bullet = new Bullet(this.posX, this.posY, this.positionView, this.bot, this.id);
       bulletsArr.push(bullet);
+
+      if (!this.bot) {
+        sound.bullet_shot.play();
+      }
+
       setTimeout(() => {
         this.shooting = false;
       }, 1500);
@@ -212,12 +217,24 @@ class Bullet {
           map[i][bposX] = 5;
           bulletsArr.splice(bulletsArr.indexOf(this), 1);
           this.animationHit();
+
+          if (!this.bot){
+            sound.bullet_hit_2.play();
+          }
+
         }
       }
+
       if (blockY === 1 || blockY === 2) {
         if (bposY < (i + 1)) {
           bulletsArr.splice(bulletsArr.indexOf(this), 1);
+
+          if (!this.bot) {
+            sound.bullet_hit_1.play();
+          }
+
           this.animationHit();
+
         }
       }
     }
@@ -233,6 +250,7 @@ class Bullet {
             bulletsArr.splice(j, 1);
             score += 100;
             console.log(score);
+            sound.explosion_1.play();
           }
         }
       });
@@ -253,6 +271,7 @@ class Bullet {
   destroyEagle() {
     for (let j = 0; j < bulletsArr.length; j++) {
       if (isColliding(bulletsArr[j], eagle)) {
+        sound.explosion_2.play();
         bulletsArr.splice(j, 1);
         console.log('База разрушена');
       }
@@ -333,6 +352,7 @@ function init() {
 /* --------------------------------------------------------------- */
 
 function startGame() {
+  sound.stage_start.play();
   window.requestAnimationFrame(tick);
   setInterval(generateBotTank, 2500);
 }
