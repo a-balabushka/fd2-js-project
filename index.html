@@ -2,13 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Battle City</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="container" style="background-color: black">
-  <canvas id="canvas" width="416" height="416" style="border: 2px red solid"></canvas>
-</div>
-  <script src="levels.js"></script>
-  <script src="script.js"></script>
+  <div id="container" style="background-color: black">
+    <div id="main">
+      <img id="battle_city" src="img/battle_city.png" alt="battle_city">
+      <div id="menu">
+        <div class="play-button" onclick="switchToPlay()">PLAY</div>
+        <div onclick="switchToControls()">CONTROLS</div>
+        <div onclick="switchToRecords()">RECORDS</div>
+      </div>
+      <div>
+        <img class="namcot" src="img/namcot.png" alt="namcot">
+        <p><img src="img/copyright.png" alt="copyright"> 1980 1985 NAMCO LTD.</p>
+        <p>ALL RIGHTS RESERVED</p>
+      </div>
+    </div>
+    <div id="play">
+      <canvas id="canvas" width="616" height="616"></canvas>
+      <div class="damper">
+        <p id="level_num">LEVEL 1</p>
+      </div>
+      <div class="damper"></div>
+      <div id="button-start">START</div>
+    </div>
+    <div id="controls">
+      <div>CONTROLS</div>
+      <div>
+        <img src="img/ArrowsPS1.png" alt="arrows_img">
+        <p>MOVE</p>
+      </div>
+      <div>
+        <img src="img/SpacePS1.png" alt="space_img">
+        <p>SHOOT</p>
+      </div>
+      <div class="back_button" onclick="switchToMain()">BACK</div>
+    </div>
+    <div id="records">
+      <div>RECORDS</div>
+      <p>PAGE UNDER CONSTRUCTION</p>
+      <div class="back_button" onclick="switchToMain()">BACK</div>
+    </div>
+  </div>
+  
+  <script src="js/jquery/jquery-3.3.1.min.js"></script>
+  <script src="js/spa.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/helper.js"></script>
+
 </body>
 </html>

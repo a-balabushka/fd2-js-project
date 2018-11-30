@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const tileSize = 16; // tile size
 const mapSize = 26; // number of tiles
-// 0: brick, 1: steel, 2: water, 3: tree, 5: blank
+// 0: brick, 1: steel, 2: water, 3: tree, 4: border, 5: blank
 
 let map;
 let tankAmount;
@@ -23,7 +23,6 @@ sprite.src = 'img/sprites.png';
 const trees = new Image();
 trees.onload = drawGame;
 trees.src = 'img/trees.png';
-
 
 /* --------------------------------------------------------------- */
 
@@ -199,16 +198,16 @@ class Tank {
     if (this.speedX !== 0 || this.speedY !== 0) {
       switch (this.positionView) {
         case 1:
-          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 210;
+          this.spriteX = Math.floor(this.counter / 3 % 2) * 35 + 210;
           break;
         case 2:
-          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 140;
+          this.spriteX = Math.floor(this.counter / 3 % 2) * 35 + 140;
           break;
         case 3:
-          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3);
+          this.spriteX = Math.floor(this.counter / 3 % 2) * 35;
           break;
         case 4:
-          this.spriteX = Math.floor(this.counter / 3 % 2) * (this.size + 3) + 70;
+          this.spriteX = Math.floor(this.counter / 3 % 2) * 35 + 70;
           break;
       }
     } else {
@@ -231,7 +230,7 @@ class Tank {
 
   draw() {
     this.animation();
-    context.drawImage(sprite, this.spriteX, this.spriteY, 32, 32, this.posX, this.posY, 32, 32);
+    context.drawImage(sprite, this.spriteX, this.spriteY, 32, 32, this.posX, this.posY, this.size, this.size);
     this.update();
   }
 }
@@ -243,7 +242,7 @@ class Bullet {
     this.posX = x + 12;
     this.posY = y + 12;
     this.size = 8;
-    this.speed = 3;
+    this.speed = 5;
     this.positionView = positionView;
     this.counter = 0;
   }
@@ -315,7 +314,7 @@ class Bullet {
 
   animationHit() {
     for (let i = 0; i < 3; i++) {
-      context.drawImage(sprite, (Math.floor(this.counter / 60 % 3)) * i * 35, 100, 32, 32, this.posX - 12, this.posY - 12, 32, 32);
+      context.drawImage(sprite, (Math.floor(this.counter / 60 % 3)) * i * 35, 100, 32, 32, this.posX - 12, this.posY - 12, this.size, this.size);
     }
   }
 
@@ -352,7 +351,7 @@ const eagle = {
   posY: 384,
   size: tileSize * 2,
   draw() {
-    context.drawImage(sprite, 105, 100, 32, 32, this.posX, this.posY, 32, 32);
+    context.drawImage(sprite, 105, 100, 32, 32, this.posX, this.posY, this.size, this.size);
   },
 };
 
@@ -380,17 +379,17 @@ function isColliding(a, b) {
 
 function init() {
   map = Array.from(levels.level1);
-  userTank = new Tank(144, 384, 1.25, 0, false, 100);
-  botTanksArr = [new Tank(0, 0, 0.75, 40, true, 0)];
-  tankAmount = 4;
+  userTank = new Tank(144, 384, 2, 0, false, 100);
+  botTanksArr = [];
+  tankAmount = 5;
 }
 
 /* --------------------------------------------------------------- */
 
-(function startGame() {
+function startGame() {
   window.requestAnimationFrame(tick);
   setInterval(generateBotTank, 5000);
-})();
+}
 
 function tick() {
   drawGame();
@@ -402,7 +401,7 @@ function generateBotTank() {
   if ((tankAmount !== 0) && (botTanksArr.length < 5)) {
     const x = Math.floor(Math.random() * (2 + 1));
     idCount += 1;
-    botTanksArr.push(new Tank(x * 200, 0, 0.5, 40, true, idCount));
+    botTanksArr.push(new Tank(x * 200, 0, 1, 40, true, idCount));
     tankAmount--;
   }
 }
@@ -443,13 +442,13 @@ function drawMap() {
     for (let x = 0; x < mapSize; x++) {
       switch (map[y][x]) {
         case 0:
-          context.drawImage(sprite, 60, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          context.drawImage(sprite, 60, 80, 16, 16, x * tileSize, y * tileSize, tileSize, tileSize);
           break;
         case 1:
-          context.drawImage(sprite, 85, 80, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          context.drawImage(sprite, 85, 80, 16, 16, x * tileSize, y * tileSize, tileSize, tileSize);
           break;
         case 3:
-          context.drawImage(trees, 0, 0, 16, 16, x * tileSize, y * tileSize, 16, 16);
+          context.drawImage(trees, 0, 0, 16, 16, x * tileSize, y * tileSize, tileSize, tileSize);
           break;
       }
     }
@@ -458,31 +457,20 @@ function drawMap() {
 
 function nextLevel(num) {
   const levelKey = `level${num}`;
+
+  animationDampers(num);
+
   for (let key in levels) {
     if (levelKey == key) {
       map = Array.from(levels[key]);
       tankAmount = 5;
-    }
 
+    }
     if (num === 4) {
       tankAmount = Infinity;
     }
-  }
 
-  /*  switch (level) {
-    case 2:
-      map = Array.from(level2);
-      tankAmount = 5;
-      break;
-    case 3:
-      map = Array.from(level3);
-      tankAmount = 5;
-      break;
-    case 4:
-      map = Array.from(level4);
-      tankAmount = Infinity;
-      break;
-  } */
+  }
 }
 
 /* --------------------------------------------------------------- */
