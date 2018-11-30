@@ -1,184 +1,250 @@
-.tankPlayerD_t1, .tankPlayerD_t2, .tankPlayerL_t1, .tankPlayerL_t2, .tankPlayerR_t1, .tankPlayerR_t2, .tankPlayerU_t1, .tankPlayerU_t2, .tankPower1D_t1, .tankPower1D_t2, .tankPower1L_t1, .tankPower1L_t2, .tankPower1R_t1, .tankPower1R_t2, .tankPower1U_t1, .tankPower1U_t2, .bullet_down, .bullet_left, .bullet_right, .bullet_up, .wall_brick, .wall_steel, .bullet_explosion_1, .bullet_explosion_2, .bullet_explosion_3, .base, .appear_1, .appear_2, .appear_3, .appear_4{
+.tank_player1_up_c0_t1, .tank_player1_up_c0_t2, .tank_player1_right_c0_t1, .tank_player1_right_c0_t2, .tank_player1_left_c0_t1, .tank_player1_left_c0_t2, .tank_player1_down_c0_t1, .tank_player1_down_c0_t2, .tank_power_up_c0_t1, .tank_power_up_c0_t2, .tank_power_right_c0_t1, .tank_power_right_c0_t2, .tank_power_left_c0_t1, .tank_power_left_c0_t2, .tank_power_down_c0_t1, .tank_power_down_c0_t2, .tank_fast_up_c0_t1, .tank_fast_up_c0_t2, .tank_fast_right_c0_t1, .tank_fast_right_c0_t2, .tank_fast_left_c0_t1, .tank_fast_left_c0_t2, .tank_fast_down_c0_t1, .tank_fast_down_c0_t2, .bullet_up, .bullet_right, .bullet_down, .bullet_left, .wall_brick, .wall_steel, .trees, .border, .base, .base_destroyed, .bullet_explosion_1, .bullet_explosion_2, .bullet_explosion_3, .big_explosion_1, .big_explosion_2, .big_explosion_3, .big_explosion_4{
 	background: url(sprites.png) no-repeat;
 }
 
-.tankPlayerD_t1{
+.tank_player1_up_c0_t1{
 	background-position: 0 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPlayerD_t2{
+.tank_player1_up_c0_t2{
 	background-position: -35px 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPlayerL_t1{
+.tank_player1_right_c0_t1{
 	background-position: -70px 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPlayerL_t2{
+.tank_player1_right_c0_t2{
 	background-position: -105px 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPlayerR_t1{
-	background-position: -140px 0;
-	width: 32px;
-	height: 32px;
-}
-
-.tankPlayerR_t2{
-	background-position: -175px 0;
-	width: 32px;
-	height: 32px;
-}
-
-.tankPlayerU_t1{
+.tank_player1_left_c0_t1{
 	background-position: -210px 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPlayerU_t2{
+.tank_player1_left_c0_t2{
 	background-position: -245px 0;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1D_t1{
+.tank_player1_down_c0_t1{
+	background-position: -140px 0;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_player1_down_c0_t2{
+	background-position: -175px 0;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_power_up_c0_t1{
 	background-position: 0 -40px ;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1D_t2{
-	background-position: -35px -40px ;
+.tank_power_up_c0_t2{
+	background-position: -35px -40.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1L_t1{
+.tank_power_right_c0_t1{
 	background-position: -70px -40px ;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1L_t2{
-	background-position: -105px -40px ;
+.tank_power_right_c0_t2{
+	background-position: -105px -40.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1R_t1{
-	background-position: -140px -40px ;
-	width: 32px;
-	height: 32px;
-}
-
-.tankPower1R_t2{
-	background-position: -175px -40px ;
-	width: 32px;
-	height: 32px;
-}
-
-.tankPower1U_t1{
+.tank_power_left_c0_t1{
 	background-position: -210px -40px ;
 	width: 32px;
 	height: 32px;
 }
 
-.tankPower1U_t2{
-	background-position: -245px -40px ;
+.tank_power_left_c0_t2{
+	background-position: -245px -40.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
-.bullet_down{
-	background-position: 0 -80px ;
-	width: 8px;
-	height: 8px;
+.tank_power_down_c0_t1{
+	background-position: -140px -40.00001525878906px ;
+	width: 32px;
+	height: 32px;
 }
 
-.bullet_left{
-	background-position: -15px -80px ;
+.tank_power_down_c0_t2{
+	background-position: -175px -40.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_up_c0_t1{
+	background-position: 0 -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_up_c0_t2{
+	background-position: -35px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_right_c0_t1{
+	background-position: -70px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_right_c0_t2{
+	background-position: -105px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_left_c0_t1{
+	background-position: -210px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_left_c0_t2{
+	background-position: -245px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_down_c0_t1{
+	background-position: -140px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.tank_fast_down_c0_t2{
+	background-position: -175px -80.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.bullet_up{
+	background-position: 0 -120px ;
 	width: 8px;
 	height: 8px;
 }
 
 .bullet_right{
-	background-position: -30px -80px ;
+	background-position: -15px -120px ;
 	width: 8px;
 	height: 8px;
 }
 
-.bullet_up{
-	background-position: -45px -80px ;
+.bullet_down{
+	background-position: -30px -120.00001525878906px ;
+	width: 8px;
+	height: 8px;
+}
+
+.bullet_left{
+	background-position: -45px -120.00001525878906px ;
 	width: 8px;
 	height: 8px;
 }
 
 .wall_brick{
-	background-position: -60px -80px ;
+	background-position: -75px -120.00001525878906px ;
 	width: 16px;
 	height: 16px;
 }
 
 .wall_steel{
-	background-position: -85px -80px ;
+	background-position: -100px -120px ;
 	width: 16px;
 	height: 16px;
 }
 
+.trees{
+	background-position: -150px -120px ;
+	width: 32px;
+	height: 32px;
+}
+
+.border{
+	background-position: -125px -120px ;
+	width: 16px;
+	height: 16px;
+}
+
+.base{
+	background-position: -200px -120.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
+.base_destroyed{
+	background-position: -240px -120.00001525878906px ;
+	width: 32px;
+	height: 32px;
+}
+
 .bullet_explosion_1{
-	background-position: 0 -99.99432373046875px ;
+	background-position: 0 -140.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
 .bullet_explosion_2{
-	background-position: -35px -100px ;
+	background-position: -35px -140.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
 .bullet_explosion_3{
-	background-position: -70px -100px ;
+	background-position: -70px -140.00001525878906px ;
 	width: 32px;
 	height: 32px;
 }
 
-.base{
-	background-position: -105px -100px ;
-	width: 32px;
-	height: 32px;
+.big_explosion_1{
+	background-position: 0 -180.00001525878906px ;
+	width: 64px;
+	height: 64px;
 }
 
-.appear_1{
-	background-position: 0 -135.00001525878906px ;
-	width: 32px;
-	height: 32px;
+.big_explosion_2{
+	background-position: -70px -180px ;
+	width: 64px;
+	height: 64px;
 }
 
-.appear_2{
-	background-position: -35px -135.00001525878906px ;
-	width: 32px;
-	height: 32px;
+.big_explosion_3{
+	background-position: -140px -180px ;
+	width: 64px;
+	height: 64px;
 }
 
-.appear_3{
-	background-position: -70px -135.00001525878906px ;
-	width: 32px;
-	height: 32px;
-}
-
-.appear_4{
-	background-position: -105px -135.00001525878906px ;
-	width: 32px;
-	height: 32px;
+.big_explosion_4{
+	background-position: -210px -180px ;
+	width: 64px;
+	height: 64px;
 }
 
