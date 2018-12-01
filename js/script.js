@@ -1,23 +1,30 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
-const mapSize = 28; // number of tiles
-const tileSize = 22;
+const mapSize = 28; // длина массива карт
+const tileSize = 22; // размер одной ячейки
 
-let map;
-let tankAmount;
+let map; // текущая карта
+let tankAmount; // количество танков на поле
 
-let userTank;
-let botTanksArr = [];
-const bulletsArr = [];
+let userTank; // пользовательский танк
+let botTanksArr = []; // массив ботов на карте
+const bulletsArr = []; // массив пуль на карте
 
-let score = 0;
-let level = 1;
+let idCount = 0; // id для ботов
+let score = 0; // счет пользователя
+let level = 1; // номер уровня
+
+let gameOver = false; // значение конца игры
 
 /* --------------------------------------------------------------- */
 
 const sprite = new Image();
 sprite.onload = drawGame;
 sprite.src = 'img/sprites.png';
+
+const gameOver1 = new Image();
+gameOver1.onload = drawGame;
+gameOver1.src = 'img/game_over.png';
 
 /* --------------------------------------------------------------- */
 
@@ -44,9 +51,6 @@ class Tank {
 
   randomBotMotion() {
     function botMotion(entity) {
-      function randomDiap(N, M) {
-        return Math.floor(Math.random() * (M - N + 1) + N);
-      }
       const direction = randomDiap(1, 4);
       const timeDirection = randomDiap(1000, 3000);
       switch (direction) {
@@ -149,7 +153,7 @@ class Tank {
   deathUser() {
     botTanksArr.forEach((bot) => {
       if (isColliding(bot, userTank)) {
-        console.log('Раздавлен');
+        gameOver = true;
       }
     });
   }
@@ -249,7 +253,6 @@ class Bullet {
             botTanksArr.splice(i, 1);
             bulletsArr.splice(j, 1);
             score += 100;
-            console.log(score);
             sound.explosion_1.play();
           }
         }
@@ -261,8 +264,8 @@ class Bullet {
     if (this.bot) {
       for (let j = 0; j < bulletsArr.length; j++) {
         if (isColliding(bulletsArr[j], userTank)) {
+          gameOver = true;
           bulletsArr.splice(j, 1);
-          console.log('Прямое попадание');
         }
       }
     }
@@ -273,7 +276,7 @@ class Bullet {
       if (isColliding(bulletsArr[j], eagle)) {
         sound.explosion_2.play();
         bulletsArr.splice(j, 1);
-        console.log('База разрушена');
+        gameOver = true;
       }
     }
   }
@@ -326,22 +329,6 @@ init();
 
 /* --------------------------------------------------------------- */
 
-function isColliding(a, b) {
-  let result = false;
-
-  const aRight = a.posX + a.size;
-  const aBottom = a.posY + a.size;
-  const bRight = b.posX + b.size;
-  const bBottom = b.posY + b.size;
-
-  if (a.posX <= bRight && aRight >= b.posX && a.posY <= bBottom && aBottom >= b.posY) {
-    result = true;
-  }
-  return result;
-}
-
-/* --------------------------------------------------------------- */
-
 function init() {
   map = Array.from(levels.level1);
   userTank = new Tank(220, 550, 2, 0, false, 100);
@@ -358,14 +345,17 @@ function startGame() {
 }
 
 function tick() {
-  drawGame();
-  window.requestAnimationFrame(tick);
+  if (!gameOver) {
+    drawGame();
+    window.requestAnimationFrame(tick);
+  } else {
+    endGame();
+  }
 }
 
-let idCount = 0;
 function generateBotTank() {
   if ((tankAmount !== 0) && (botTanksArr.length < 5)) {
-    const x = Math.floor(Math.random() * (2 + 1));
+    const x = randomDiap(0, 2);
     idCount += 1;
     switch (x) {
       case 0:
@@ -408,8 +398,8 @@ function drawMap() {
       level++;
     }
 
-    userTank.posX = 144;
-    userTank.posY = 384;
+    userTank.posX = 220;
+    userTank.posY = 550;
     userTank.positionView = 1;
     nextLevel(level);
   }
@@ -451,6 +441,23 @@ function nextLevel(num) {
     }
 
   }
+}
+
+function endGame() {
+  const x = (canvas.width - 248) / 2;
+  const y = (canvas.height - 360) / 2;
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(gameOver1, x, y);
+
+  context.textAlign = 'center';
+  context.fillStyle = 'white';
+  context.font = '18px prstart';
+  context.fillText(`SCORE: ${score}`, canvas.width / 2, canvas.height / 1.5);
+
+  context.font = '12px prstart';
+  context.fillText(`REFRESH TO REPEAT`, canvas.width / 2, canvas.height / 1.05);
+  sound.game_over.play();
 }
 
 /* --------------------------------------------------------------- */

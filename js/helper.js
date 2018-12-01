@@ -1,10 +1,10 @@
-/*Анимация при запуске*/
+// Анимация при запуске
 $(document).ready(() => {
   $('#container').show(3000);
 });
 
 
-/*Анимация серых блоков*/
+// Анимация серых блоков
 $('.play-button').click(function() {
   animationDampers();
 });
@@ -28,3 +28,25 @@ $('#button-start').click(() => {
   startGame();
   $('#button-start').remove();
 })
+
+/* --------------------------------------------------------------- */
+
+// проверяет пересечение аргументов
+function isColliding(a, b) {
+  let result = false;
+
+  const aRight = a.posX + a.size;
+  const aBottom = a.posY + a.size;
+  const bRight = b.posX + b.size;
+  const bBottom = b.posY + b.size;
+
+  if (a.posX <= bRight && aRight >= b.posX && a.posY <= bBottom && aBottom >= b.posY) {
+    result = true;
+  }
+  return result;
+}
+
+// функция рандома
+function randomDiap(N, M) {
+  return Math.floor(Math.random() * (M - N + 1) + N);
+}
