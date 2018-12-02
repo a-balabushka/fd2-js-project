@@ -22,7 +22,7 @@ function renderNewState() {
       refreshPage();
 
       document.title = 'Play - Battle City';
-      document.getElementById('play').style.display = 'block';
+      document.getElementById('play').style.display = 'flex';
       document.getElementById('controls').style.display = 'none';
       document.getElementById('records').style.display = 'none';
       document.getElementById('main').style.display = 'none';

@@ -10,7 +10,6 @@ let userTank; // пользовательский танк
 const botTanksArr = []; // массив ботов на карте
 const bulletsArr = []; // массив пуль на карте
 
-
 let idCount = 0; // id для ботов
 let score = 0; // счет пользователя
 let level = 1; // номер уровня
@@ -53,7 +52,7 @@ class Tank {
 
   randomBotMotion() {
     function botMotion(entity) {
-      const direction = randomDiap(1, 4);
+      const direction = randomDiap(1, 5);
       const timeDirection = randomDiap(1000, 3000);
       switch (direction) {
         case 1:
@@ -63,10 +62,10 @@ class Tank {
           entity.right();
           break;
         case 3:
-          entity.down();
-          break;
-        case 4:
           entity.left();
+          break;
+        default:
+          entity.down();
           break;
       }
       entity.shoot();
@@ -208,7 +207,6 @@ class Bullet {
     this.size = 10;
     this.speed = 5;
     this.positionView = positionView;
-    this.counter = 0;
   }
 
   collisionDetection() {
@@ -221,7 +219,6 @@ class Bullet {
         if (bposY < (i + 1)) {
           map[i][bposX] = 5;
           bulletsArr.splice(bulletsArr.indexOf(this), 1);
-          this.animationHit();
 
           if (!this.bot){
             sound.bullet_hit_2.play();
@@ -237,9 +234,6 @@ class Bullet {
           if (!this.bot) {
             sound.bullet_hit_1.play();
           }
-
-          this.animationHit();
-
         }
       }
     }
@@ -261,6 +255,7 @@ class Bullet {
     } else {
       for (let i = 0; i < bulletsArr.length; i++) {
         if (isColliding(bulletsArr[i], userTank) && bulletsArr[i].bot) {
+          userTank.exist = false;
           gameOver = true;
         }
       }
@@ -274,12 +269,6 @@ class Bullet {
         bulletsArr.splice(j, 1);
         gameOver = true;
       }
-    }
-  }
-
-  animationHit() {
-    for (let i = 0; i < 3; i++) {
-      context.drawImage(sprite, (Math.floor(this.counter / 60 % 3)) * i * 35, 100, 32, 32, this.posX - 12, this.posY - 12, this.size, this.size);
     }
   }
 
@@ -485,3 +474,55 @@ document.addEventListener('keyup', (EO) => {
     userTank.speedX = 0;
   }
 });
+
+/* --------------------------------------------------------------- */
+
+document.addEventListener('touchstart', handleTouchStart, false);
+document.addEventListener('touchmove', handleTouchMove, false);
+document.addEventListener('touchend', handleTouchEnd, false);
+document.addEventListener('touchstart', doubleTap, false);
+
+
+let xDown = null;
+let yDown = null;
+let lastTap;
+
+function handleTouchStart(evt) {
+  xDown = evt.touches[0].clientX;
+  yDown = evt.touches[0].clientY;
+}
+
+function handleTouchMove(evt) {
+  if (!xDown || !yDown) {
+    return;
+  }
+
+  let xUp = evt.touches[0].clientX;
+  let yUp = evt.touches[0].clientY;
+
+  let xDiff = xDown - xUp;
+  let yDiff = yDown - yUp;
+
+  if (Math.abs(xDiff) > Math.abs(yDiff)) {/*most significant*/
+    (xDiff > 0) ? userTank.left() : userTank.right();
+  } else {
+    (yDiff > 0) ? userTank.up() : userTank.down();
+    }
+
+  xDown = null;
+  yDown = null;
+}
+
+function handleTouchEnd() {
+  userTank.speedX = 0;
+  userTank.speedY = 0;
+}
+
+function doubleTap() {
+  let firstTap = new Date().getTime();
+  let diffTap = firstTap - lastTap;
+  if (diffTap < 600) {
+    userTank.shoot();
+  }
+  lastTap = new Date().getTime();
+}

@@ -4,11 +4,11 @@ $(document).ready(() => {
 });
 
 
-// Анимация серых блоков
 $('.play-button').click(function() {
-  animationDampers();
+  $('#button-start').show();
 });
 
+// Анимация серых блоков
 function animationDampers(num) {
   $('#play').append('<div></div>');
   $('#play div').last().css({position: 'absolute', backgroundColor: 'black', height: '616px', width: '616px', zIndex: '2'});
@@ -26,8 +26,10 @@ function animationDampers(num) {
 
 $('#button-start').click(() => {
   startGame();
+  animationDampers();
+  $('#canvas').show();
   $('#button-start').remove();
-})
+});
 
 /* --------------------------------------------------------------- */
 
