@@ -7,8 +7,9 @@ let map; // текущая карта
 let tankAmount; // количество танков на поле
 
 let userTank; // пользовательский танк
-let botTanksArr = []; // массив ботов на карте
+const botTanksArr = []; // массив ботов на карте
 const bulletsArr = []; // массив пуль на карте
+
 
 let idCount = 0; // id для ботов
 let score = 0; // счет пользователя
@@ -30,6 +31,7 @@ gameOver1.src = 'img/game_over.png';
 
 class Tank {
   constructor(x, y, speed, spriteY, bot, id) {
+    this.exist = true;
     this.id = id;
     this.bot = bot;
     this.posX = x;
@@ -44,7 +46,7 @@ class Tank {
     this.positionView = 0;
     this.shooting = false;
 
-    if (this.bot) {
+    if (this.bot && this.exist) {
       this.randomBotMotion();
     }
   }
@@ -66,9 +68,8 @@ class Tank {
         case 4:
           entity.left();
           break;
-        default:
-          entity.shoot();
       }
+      entity.shoot();
       setTimeout(botMotion, timeDirection, entity);
     }
 
@@ -133,7 +134,7 @@ class Tank {
       if ((part1 >= 0 && part1 <= 2) || (part2 >= 0 && part2 <= 2)) {
         if (this.posY < (i + 1) * tileSize) {
           this.posY = (i + 1) * tileSize;
-          this.positionView = 1;
+          this.positionView = 0;
         }
       }
     }
@@ -159,7 +160,7 @@ class Tank {
   }
 
   shoot() {
-    if (!this.shooting) {
+    if (!this.shooting && this.exist) {
       this.shooting = true;
       const bullet = new Bullet(this.posX, this.posY, this.positionView, this.bot, this.id);
       bulletsArr.push(bullet);
@@ -244,12 +245,12 @@ class Bullet {
     }
   }
 
-  killBot() {
+  kill() {
     if (!this.bot) {
       botTanksArr.forEach((bot, i) => {
         for (let j = 0; j < bulletsArr.length; j++) {
-          if (isColliding(bulletsArr[j], bot)) {
-            botTanksArr[i].bot = false;
+          if (isColliding(bulletsArr[j], bot) && !bulletsArr[j].bot) {
+            botTanksArr[i].exist = false;
             botTanksArr.splice(i, 1);
             bulletsArr.splice(j, 1);
             score += 100;
@@ -257,15 +258,10 @@ class Bullet {
           }
         }
       });
-    }
-  }
-
-  deathUser() {
-    if (this.bot) {
-      for (let j = 0; j < bulletsArr.length; j++) {
-        if (isColliding(bulletsArr[j], userTank)) {
+    } else {
+      for (let i = 0; i < bulletsArr.length; i++) {
+        if (isColliding(bulletsArr[i], userTank) && bulletsArr[i].bot) {
           gameOver = true;
-          bulletsArr.splice(j, 1);
         }
       }
     }
@@ -303,8 +299,7 @@ class Bullet {
         break;
     }
     this.collisionDetection();
-    this.killBot();
-    this.deathUser();
+    this.kill();
     this.destroyEagle();
   }
 
@@ -332,7 +327,6 @@ init();
 function init() {
   map = Array.from(levels.level1);
   userTank = new Tank(220, 550, 2, 0, false, 100);
-  botTanksArr = [];
   tankAmount = 5;
 }
 
