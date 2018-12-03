@@ -154,6 +154,7 @@ class Tank {
     botTanksArr.forEach((bot) => {
       if (isColliding(bot, userTank)) {
         gameOver = true;
+        vibro();
       }
     });
   }
@@ -257,6 +258,7 @@ class Bullet {
         if (isColliding(bulletsArr[i], userTank) && bulletsArr[i].bot) {
           userTank.exist = false;
           gameOver = true;
+          vibro();
         }
       }
     }
@@ -268,6 +270,7 @@ class Bullet {
         sound.explosion_2.play();
         bulletsArr.splice(j, 1);
         gameOver = true;
+        vibro();
       }
     }
   }
@@ -525,4 +528,10 @@ function doubleTap() {
     userTank.shoot();
   }
   lastTap = new Date().getTime();
+}
+
+function vibro() {
+  if (navigator.vibrate) {
+    window.navigator.vibrate(500);
+  }
 }
